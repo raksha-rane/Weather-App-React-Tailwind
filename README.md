@@ -1,3 +1,3 @@
-#Weather App (Tailwind + React)
+# Weather App (Tailwind + React)
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
