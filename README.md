@@ -266,6 +266,18 @@ Content-Type: application/json
    - Duplicate emails
    - Non-existing contacts
    - Partial updates
+   - 
+### 8.1 Test Cases
+
+| Scenario                    | Expected Result                        |
+|-----------------------------|----------------------------------------|
+| Valid contact creation      | Returns 201 + Contact ID               |
+| Update contact’s phone      | Returns 204 No Content                 |
+| Create without LastName     | Returns 400 Bad Request                |
+| Invalid token               | Returns 401 Unauthorized               |
+| Contact not found (PATCH)   | Returns 404 Not Found                  |
+| Query non-existent email    | Returns 0 records                      |
+| Delete contact              | Returns 204 No Content, contact removed |
 
 ---
 
