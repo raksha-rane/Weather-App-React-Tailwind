@@ -28,7 +28,26 @@ The objective of this integration is to synchronize customer profile data from Z
 4. Salesforce processes the request and responds with success or error.
 5. Zeotap logs responses and handles retries or alerts on failure.
 
-*Note: Include data flow diagram in final submission if required.*
+### 2.3 Data Flow Diagram
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant ZeotapServer
+    participant SalesforceAPI
+
+    Customer->>ZeotapServer: Update contact profile
+    ZeotapServer->>SalesforceAPI: Authenticate (JWT OAuth)
+    ZeotapServer->>SalesforceAPI: GET /query/?q=SELECT Id FROM Contact WHERE Email='xyz'
+    SalesforceAPI-->>ZeotapServer: Return Contact ID (or null)
+    ZeotapServer->>ZeotapServer: Does Contact ID exist?
+    alt Exists
+        ZeotapServer->>SalesforceAPI: PATCH /sobjects/Contact/{ContactId}
+    else Not Found
+        ZeotapServer->>SalesforceAPI: POST /sobjects/Contact/
+    end
+    SalesforceAPI-->>ZeotapServer: Success/Failure Response
+    ZeotapServer->>ZeotapServer: Log and handle response
+```
 
 ---
 
@@ -58,7 +77,7 @@ This method allows backend systems to access Salesforce data without requiring i
 
 **Parameters:**
 | Parameter   | Value                                              |
-|-------------|----------------------------------------------------|
+|-------------|----------------------------------------------------||
 | grant_type  | `urn:ietf:params:oauth:grant-type:jwt-bearer`     |
 | assertion   | `<signed JWT>`                                    |
 
@@ -190,7 +209,7 @@ Content-Type: application/json
 
 ### 6.2 Common API Errors
 | Error Code | Message                   | Cause                                      |
-|------------|---------------------------|--------------------------------------------|
+|------------|---------------------------|--------------------------------------------||
 | 400        | Required fields missing   | Missing fields like LastName               |
 | 401        | Invalid session ID        | Invalid/expired access token               |
 | 403        | Insufficient access       | Insufficient permissions                   |
@@ -216,11 +235,11 @@ Content-Type: application/json
 | Salesforce Access Scope  | Zeotap has necessary API access                                            |
 | Pre-validation by Zeotap | Data is pre-validated and schema matched                                   |
 | Network/Auth Stability   | Stable token generation and authentication                                 |
-| Idempotent Design        | Duplicate requests don’t create duplicates                                |
+| Idempotent Design        | Duplicate requests don't create duplicates                                |
 
 ### 7.2 Edge Cases
 | Edge Case                         | Handling Strategy                                                                 |
-|----------------------------------|----------------------------------------------------------------------------------|
+|----------------------------------|-----------------------------------------------------------------------------------|
 | Multiple Contacts with Same Email| Return error, log conflict, and flag for manual review                           |
 | Missing Required Fields          | Reject request before sending to Salesforce                                      |
 | Deleted Contact in Salesforce    | Skip sync and log                                                                |
